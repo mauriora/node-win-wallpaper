@@ -47,7 +47,7 @@ namespace bindings {
       return;
     }
 
-    unsigned char* windowHandleBuffer = (unsigned char*)node::Buffer::Data(args[0]->ToObject());
+    unsigned char* windowHandleBuffer = (unsigned char*)node::Buffer::Data(args[0]);
 
     AttachWindow(windowHandleBuffer);
   }
