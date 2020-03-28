@@ -18,4 +18,4 @@
 
 namespace electronwallpaper {
   void AttachWindow(unsigned char*);
-}  // namespace electronwallpaper
+} // namespace electronwallpaper

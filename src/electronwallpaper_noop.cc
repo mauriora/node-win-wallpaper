@@ -18,4 +18,4 @@
 
 namespace electronwallpaper {
   void AttachWindow(unsigned char* windowHandleBuffer) {}
-}  // namespace electronwallpaper
+} // namespace electronwallpaper

@@ -14,6 +14,9 @@ let mainWindow;
  */
 const createWindow = function() {
   const windowProperties = {
+    webPreferences: {
+      nodeIntegration: true
+    },
     width: 800,
     height: 600
   };

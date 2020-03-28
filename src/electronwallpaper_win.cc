@@ -16,8 +16,8 @@
 
 #include "./electronwallpaper.h"
 
-#include <windows.h>
 #include <iostream>
+#include <windows.h>
 
 namespace electronwallpaper {
   // Message to Progman to spawn a WorkerW
@@ -47,18 +47,17 @@ namespace electronwallpaper {
 
     HWND progman = FindWindow("Progman", NULL);
     LRESULT result = SendMessageTimeout(
-      progman,
-      WM_SPAWN_WORKER,
-      NULL,
-      NULL,
-      SMTO_NORMAL,
-      1000,
-      NULL);
+        progman,
+        WM_SPAWN_WORKER,
+        NULL,
+        NULL,
+        SMTO_NORMAL,
+        1000,
+        NULL);
 
     if (!result) {
       // TODO(robin): GetLastError() and handle properly
     }
-
 
     // TODO(robin): Handle return value of EnumWindows
     EnumWindows(&FindWorkerW, reinterpret_cast<LPARAM>(&workerw));
@@ -76,4 +75,4 @@ namespace electronwallpaper {
 
     SetParent(hwnd, workerw);
   }
-}  // namespace electronwallpaper
+} // namespace electronwallpaper
