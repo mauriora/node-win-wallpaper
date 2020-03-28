@@ -15,8 +15,9 @@
  */
 
 #include "./electronwallpaper.h"
-
-#include <iostream>
+#include "./log.h"
+#include <napi.h>
+#include <sstream>
 #include <windows.h>
 
 namespace electronwallpaper {
@@ -41,7 +42,7 @@ namespace electronwallpaper {
     return TRUE;
   }
 
-  void AttachWindow(unsigned char* handleBuffer) {
+  void AttachWindow(unsigned char* handleBuffer, Napi::Env env) {
     LONG_PTR handle = *reinterpret_cast<LONG_PTR*>(handleBuffer);
     HWND hwnd = (HWND)(LONG_PTR)handle;
 
@@ -56,11 +57,17 @@ namespace electronwallpaper {
         NULL);
 
     if (!result) {
-      // TODO(robin): GetLastError() and handle properly
+      std::stringstream lastError;
+      lastError << GetLastError();
+      electronwallpaper::createError(env, "Unable to spawn new worker: " + lastError.str()).ThrowAsJavaScriptException();
     }
 
-    // TODO(robin): Handle return value of EnumWindows
-    EnumWindows(&FindWorkerW, reinterpret_cast<LPARAM>(&workerw));
+    bool enumWindowsResult = EnumWindows(&FindWorkerW, reinterpret_cast<LPARAM>(&workerw));
+
+    if (!enumWindowsResult && workerw == NULL) {
+      std::stringstream lastError;
+      electronwallpaper::createError(env, "Unable to find WorkerW: " + lastError.str()).ThrowAsJavaScriptException();
+    }
 
     // Update style of the Window we want to attach
     SetWindowLong(hwnd, GWL_EXSTYLE, WS_EX_LAYERED);

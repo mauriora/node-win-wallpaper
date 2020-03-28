@@ -15,7 +15,8 @@
  */
 
 #pragma once
+#include <napi.h>
 
 namespace electronwallpaper {
-  void AttachWindow(unsigned char*);
+  void AttachWindow(unsigned char*, Napi::Env env);
 } // namespace electronwallpaper

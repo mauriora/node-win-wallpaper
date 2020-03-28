@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
+#include <napi.h>
 #include "./electronwallpaper.h"
 
 namespace electronwallpaper {
-  void AttachWindow(unsigned char* windowHandleBuffer) {}
+  void AttachWindow(unsigned char* windowHandleBuffer, Napi::Env env) {}
 } // namespace electronwallpaper
