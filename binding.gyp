@@ -4,7 +4,7 @@
       "target_name": "electron-wallpaper",
       "sources": [
         "src/bindings.cc",
-        "src/log.cc"
+        "src/output.cc"
       ],
       "include_dirs": [
         "<!@(node -p \"require('node-addon-api').include\")"

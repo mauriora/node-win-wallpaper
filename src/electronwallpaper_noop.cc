@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-#include <napi.h>
 #include "./electronwallpaper.h"
+#include "./output.h"
+#include <napi.h>
 
 namespace electronwallpaper {
-  void AttachWindow(unsigned char* windowHandleBuffer, Napi::Env env) {}
+  void AttachWindow(unsigned char* windowHandleBuffer, Napi::Env env) {
+    electronwallpaper::Output::createError(env, "Platform not supported.").ThrowAsJavaScriptException();
+  }
 } // namespace electronwallpaper
