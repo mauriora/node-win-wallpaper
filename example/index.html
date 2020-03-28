@@ -87,9 +87,15 @@
 
           dashboardWindow = new electron.remote.BrowserWindow(windowProperties);
           dashboardWindow.loadFile('dashboard.html');
-          electronWallpaper.attachWindow(dashboardWindow);
-          attachMessage.innerText = 'Attached a window running dashboard.html to the desktop, the dashboard will be killed when you destroy this window. But the default behaviour is to let the window live.';
-        };
+
+          try {
+            electronWallpaper.attachWindow(dashboardWindow);
+            attachMessage.innerText = 'Attached a window running dashboard.html to the desktop, the dashboard will be killed when you destroy this window. But the default behaviour is to let the window live.';
+          } catch (error) {
+            attachMessage.innerText = 'Unable to attach window: Error ' + error.message;
+            dashboardWindow = null;
+          }
+         };
 
         const closeDashboard = function() {
           if (dashboardWindow) {
