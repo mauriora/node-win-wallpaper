@@ -14,47 +14,31 @@
  * limitations under the License.
  */
 
-#include <node.h>
-#include <node_buffer.h>
-
+#include <napi.h>
 #include "./electronwallpaper.h"
 
-namespace bindings {
-  using v8::Boolean;
-  using v8::Exception;
-  using v8::FunctionCallbackInfo;
-  using v8::HandleScope;
-  using v8::Isolate;
-  using v8::Local;
-  using v8::Object;
-  using v8::String;
-  using v8::Value;
+void AttachWindowExport(const Napi::CallbackInfo &info)
+{
+  Napi::Env env = info.Env();
 
-  using electronwallpaper::AttachWindow;
-
-  void AttachWindowExport(const FunctionCallbackInfo<Value>& args) {
-    Isolate* isolate = Isolate::GetCurrent();
-    HandleScope scope(isolate);
-
-    if (args.Length() < 1) {
-      isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Expected one argument")));
-      return;
-    }
-
-    if (!args[0]->IsObject()) {
-      Local<String> message = String::NewFromUtf8(isolate, "Expected first argument to be a window handle buffer");
-      isolate->ThrowException(Exception::TypeError(message));
-      return;
-    }
-
-    unsigned char* windowHandleBuffer = (unsigned char*)node::Buffer::Data(args[0]->ToObject());
-
-    AttachWindow(windowHandleBuffer);
+  if (info.Length() < 1)
+  {
+    throw Napi::TypeError::New(env, "Expected one argument");
+  }
+  else if (!info[0].IsObject())
+  {
+    throw Napi::TypeError::New(env, "Expected first argument to be a window handle buffer");
   }
 
-  void Initialize(Local<Object> exports) {
-    NODE_SET_METHOD(exports, "attachWindow", AttachWindowExport);
-  }
-}  // namespace bindings
+  unsigned char *windowHandleBuffer = info[0].As<Napi::Uint8Array>().Data();
 
-NODE_MODULE(module_name, bindings::Initialize)
+  electronwallpaper::AttachWindow(windowHandleBuffer);
+}
+
+Napi::Object Init(Napi::Env env, Napi::Object exports)
+{
+  exports.Set(Napi::String::New(env, "attachWindow"), Napi::Function::New(env, AttachWindowExport));
+  return exports;
+}
+
+NODE_API_MODULE(module_name, Init)
