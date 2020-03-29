@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-#include "./electronwallpaper.h"
 #include "./output.h"
 #include <napi.h>
-#include <sstream>
 #include <system_error>
 #include <tchar.h>
 #include <windows.h>
@@ -26,17 +24,17 @@ namespace electronwallpaper {
   // Message to Progman to spawn a WorkerW
   int WM_SPAWN_WORKER = 0x052C;
 
-  struct WokerWRef {
+  struct WorkerWRef {
   public:
     HWND handle;
   };
 
   BOOL CALLBACK FindWorkerW(HWND hwnd, LPARAM param) {
-    HWND shelldll = FindWindowEx(hwnd, NULL, _T("SHELLDLL_DefView"), NULL);
+    HWND shelldll = FindWindowEx(hwnd, nullptr, _T("SHELLDLL_DefView"), nullptr);
 
     if (shelldll) {
-      WokerWRef* workerRef = reinterpret_cast<WokerWRef*>(param);
-      workerRef->handle = FindWindowEx(NULL, hwnd, _T("WorkerW"), NULL);
+      auto* workerRef = reinterpret_cast<WorkerWRef*>(param);
+      workerRef->handle = FindWindowEx(nullptr, hwnd, _T("WorkerW"), nullptr);
       return FALSE;
     }
 
@@ -46,10 +44,10 @@ namespace electronwallpaper {
   void AttachWindow(unsigned char* handleBuffer, Napi::Env env) {
     LONG_PTR handle = *reinterpret_cast<LONG_PTR*>(handleBuffer);
     HWND hwnd = (HWND)(LONG_PTR)handle;
-    WokerWRef workerRef;
+    WorkerWRef workerRef{};
 
-    HWND progman = FindWindow(_T("Progman"), NULL);
-    LRESULT result = SendMessageTimeout(progman, WM_SPAWN_WORKER, NULL, NULL, SMTO_NORMAL, 1000, NULL);
+    HWND progman = FindWindow(_T("Progman"), nullptr);
+    LRESULT result = SendMessageTimeout(progman, WM_SPAWN_WORKER, NULL, NULL, SMTO_NORMAL, 1000, nullptr);
 
     if (!result) {
       std::string lastError = std::system_category().message(GetLastError());
@@ -57,7 +55,7 @@ namespace electronwallpaper {
     }
 
     bool enumWindowsResult = EnumWindows(&FindWorkerW, reinterpret_cast<LPARAM>(&workerRef));
-    if (!enumWindowsResult && workerRef.handle == NULL) {
+    if (!enumWindowsResult && workerRef.handle == nullptr) {
       std::string lastError = std::system_category().message(GetLastError());
       electronwallpaper::Output::createError(env, "Unable to find WorkerW: " + lastError).ThrowAsJavaScriptException();
     }

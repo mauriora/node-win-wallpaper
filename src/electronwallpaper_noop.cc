@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-#include "./electronwallpaper.h"
 #include "./output.h"
 #include <napi.h>
 

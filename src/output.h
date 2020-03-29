@@ -5,7 +5,7 @@
 namespace electronwallpaper {
   class Output {
   public:
-    static Napi::Error createError(Napi::Env env, std::string mesg, bool log = true) {
+    static Napi::Error createError(Napi::Env env,const std::string& mesg, bool log = true) {
       if (log) {
         std::cerr << "[ERROR] (electron-wallpaper) " << mesg << std::endl;
       }
@@ -13,7 +13,7 @@ namespace electronwallpaper {
     };
 
   public:
-    static void debug(std::string mesg) {
+    static void debug(const std::string& mesg) {
       std::cout << "[DEBUG] (electron-wallpaper) " << mesg << std::endl;
     };
   };
