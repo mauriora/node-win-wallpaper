@@ -86,7 +86,7 @@
           };
 
           dashboardWindow = new electron.remote.BrowserWindow(windowProperties);
-          dashboardWindow.loadFile('dashboard.html');
+          dashboardWindow.loadFile('dashboard.html', {query: {title: 'Kia Ora', color: 'green'}});
 
           try {
             electronWallpaper.attachWindow(dashboardWindow);
