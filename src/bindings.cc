@@ -15,7 +15,7 @@
  */
 
 #include "./electronwallpaper.h"
-#include "./log.h"
+#include "./output.h"
 #include <iostream>
 #include <napi.h>
 
@@ -23,9 +23,9 @@ void AttachWindowExport(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
 
   if (info.Length() < 1) {
-    electronwallpaper::createError(env, "attachWindow expects one argument").ThrowAsJavaScriptException();
+    electronwallpaper::Output::createError(env, "attachWindow expects one argument").ThrowAsJavaScriptException();
   } else if (!info[0].IsObject()) {
-    electronwallpaper::createError(env, "attachWindow expects first argument to be a window handle buffer").ThrowAsJavaScriptException();
+    electronwallpaper::Output::createError(env, "attachWindow expects first argument to be a window handle buffer").ThrowAsJavaScriptException();
   }
 
   unsigned char* windowHandleBuffer = info[0].As<Napi::Uint8Array>().Data();

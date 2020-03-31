@@ -14,28 +14,27 @@
  * limitations under the License.
  */
 
-#include "./electronwallpaper.h"
-#include "./log.h"
+#include "./output.h"
 #include <napi.h>
-#include <sstream>
+#include <system_error>
+#include <tchar.h>
 #include <windows.h>
 
 namespace electronwallpaper {
   // Message to Progman to spawn a WorkerW
   int WM_SPAWN_WORKER = 0x052C;
 
-  // TODO(robin): Use the EnumWindows callback
-  // instead of a global
-  HWND workerw = NULL;
+  struct WorkerWRef {
+  public:
+    HWND handle;
+  };
 
-  // Window enumerator that will set the
-  // window handle for the WorkerW that is the next
-  // sibling to SHELLDLL_DefView
   BOOL CALLBACK FindWorkerW(HWND hwnd, LPARAM param) {
-    HWND shelldll = FindWindowEx(hwnd, NULL, "SHELLDLL_DefView", NULL);
+    HWND shelldll = FindWindowEx(hwnd, nullptr, _T("SHELLDLL_DefView"), nullptr);
 
     if (shelldll) {
-      workerw = FindWindowEx(NULL, hwnd, "WorkerW", NULL);
+      auto* workerRef = reinterpret_cast<WorkerWRef*>(param);
+      workerRef->handle = FindWindowEx(nullptr, hwnd, _T("WorkerW"), nullptr);
       return FALSE;
     }
 
@@ -45,41 +44,25 @@ namespace electronwallpaper {
   void AttachWindow(unsigned char* handleBuffer, Napi::Env env) {
     LONG_PTR handle = *reinterpret_cast<LONG_PTR*>(handleBuffer);
     HWND hwnd = (HWND)(LONG_PTR)handle;
+    WorkerWRef workerRef{};
 
-    HWND progman = FindWindow("Progman", NULL);
-    LRESULT result = SendMessageTimeout(
-        progman,
-        WM_SPAWN_WORKER,
-        NULL,
-        NULL,
-        SMTO_NORMAL,
-        1000,
-        NULL);
+    HWND progman = FindWindow(_T("Progman"), nullptr);
+    LRESULT result = SendMessageTimeout(progman, WM_SPAWN_WORKER, NULL, NULL, SMTO_NORMAL, 1000, nullptr);
 
     if (!result) {
-      std::stringstream lastError;
-      lastError << GetLastError();
-      electronwallpaper::createError(env, "Unable to spawn new worker: " + lastError.str()).ThrowAsJavaScriptException();
+      std::string lastError = std::system_category().message(GetLastError());
+      electronwallpaper::Output::createError(env, "Unable to spawn new worker: " + lastError).ThrowAsJavaScriptException();
     }
 
-    bool enumWindowsResult = EnumWindows(&FindWorkerW, reinterpret_cast<LPARAM>(&workerw));
-
-    if (!enumWindowsResult && workerw == NULL) {
-      std::stringstream lastError;
-      electronwallpaper::createError(env, "Unable to find WorkerW: " + lastError.str()).ThrowAsJavaScriptException();
+    bool enumWindowsResult = EnumWindows(&FindWorkerW, reinterpret_cast<LPARAM>(&workerRef));
+    if (!enumWindowsResult && workerRef.handle == nullptr) {
+      std::string lastError = std::system_category().message(GetLastError());
+      electronwallpaper::Output::createError(env, "Unable to find WorkerW: " + lastError).ThrowAsJavaScriptException();
     }
 
     // Update style of the Window we want to attach
-    SetWindowLong(hwnd, GWL_EXSTYLE, WS_EX_LAYERED);
-    SetParent(hwnd, workerw);
+    SetWindowLongPtr(hwnd, GWL_EXSTYLE, WS_EX_LAYERED);
+    SetParent(hwnd, workerRef.handle);
   }
 
-  void DetachWindow(unsigned char* handleBuffer) {
-    LONG_PTR handle = *reinterpret_cast<LONG_PTR*>(handleBuffer);
-    HWND hwnd = (HWND)(LONG_PTR)handle;
-
-    // TODO(robin): Remove the style update we applied
-
-    SetParent(hwnd, workerw);
-  }
 } // namespace electronwallpaper

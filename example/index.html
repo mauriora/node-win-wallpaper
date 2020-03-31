@@ -93,6 +93,8 @@
             attachMessage.innerText = 'Attached a window running dashboard.html to the desktop, the dashboard will be killed when you destroy this window. But the default behaviour is to let the window live.';
           } catch (error) {
             attachMessage.innerText = 'Unable to attach window: Error ' + error.message;
+            console.error(error);
+            dashboardWindow.close();
             dashboardWindow = null;
           }
          };
