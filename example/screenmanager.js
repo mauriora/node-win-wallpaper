@@ -1,5 +1,5 @@
 const {
-  app, ipcRenderer, remote
+  ipcRenderer, remote
 } = require('electron');
 
 const crypto = require('crypto');
@@ -127,7 +127,7 @@ class DisplayView {
   showDialog() {
     return remote.dialog.showOpenDialog({
       properties: [ 'openFile' ],
-      defaultPath: this.file ? this.file : app.getPath('documents'),
+      defaultPath: this.file ? this.file : remote.app.getPath('documents'),
       filters: [
         {
           name: 'Web pages',
