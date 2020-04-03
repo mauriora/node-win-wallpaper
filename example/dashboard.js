@@ -39,9 +39,3 @@ if (title) {
 if (backgroundColor) {
   document.querySelector('body').style.backgroundColor = backgroundColor;
 }
-
-if (global.showTestMessage) {
-  global.showTestMessage();
-} else {
-  console.error('dashboard.js: No global.showTestMessage()');
-}

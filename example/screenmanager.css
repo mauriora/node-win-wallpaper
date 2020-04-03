@@ -1,0 +1,48 @@
+body {
+    padding: 10px 20px;
+    color: #EEE;
+    background-color: #333;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+  }
+
+  h1, h2 {
+    margin: 0 0 10px;
+    font-weight: normal;
+  }
+
+  p {
+    font-size: 12px;
+  }
+
+  button {
+    background-color: transparent;
+    color: #52dac2;
+    border: 2px solid #52dac2;
+    border-radius: 10px;
+    padding: 5px 30px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    color: #60ffe3;
+    border-color: #60ffe3;
+  }
+
+  .button_container {
+    padding: 30px 0px;
+  }
+
+  input[type='text'] {
+    padding: 5px 10px;
+  }
+
+  input[type='text']:focus {
+    outline-color: #52dac2;
+    outline-style: solid;
+    outline-width: 2px;
+  }
+
+
+
+  
