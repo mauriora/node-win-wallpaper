@@ -53,6 +53,7 @@ class BrowserManager {
   start() {
     this.setupDisplays();
     this.createMainWindow();
+    electronWallpaper.init();
   }
 
   /**
@@ -89,20 +90,7 @@ class BrowserManager {
       console.log(`${display.id}: Once show`);
       try {
         browser.webContents.openDevTools();
-
-        // #define WM_MOVE 0x0003
-        // browser.unhookWindowMessage(WM_MOVE)
-        //
-
-        browser.unhookWindowMessage(3);
-        electronWallpaper.attachWindow(browser);
-        browser.setBounds({
-          x: display.workArea.x - this.screenRectangle.left,
-          y: display.workArea.y - this.screenRectangle.top
-        });
-
-        //                      ^^^^^^
-
+        electronWallpaper.attachWindowToDisplay(display.id,browser);
         this.browsers[display.id] = browser;
       } catch (error) {
         console.error(error);

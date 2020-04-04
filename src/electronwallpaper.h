@@ -18,5 +18,6 @@
 #include <napi.h>
 
 namespace electronwallpaper {
-  void AttachWindow(unsigned char*, Napi::Env env);
+  bool SetWindowPos(unsigned char* handleBuffer, int x, int y, int width, int height);
+  void AttachWindow(unsigned char* handleBuffer, Napi::Env env);
 } // namespace electronwallpaper

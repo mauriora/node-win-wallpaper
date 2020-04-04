@@ -18,6 +18,8 @@
 #include "./output.h"
 #include <iostream>
 #include <napi.h>
+#include <sstream>
+#include <string>
 
 void AttachWindowExport(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
@@ -33,8 +35,25 @@ void AttachWindowExport(const Napi::CallbackInfo& info) {
   electronwallpaper::AttachWindow(windowHandleBuffer, env);
 }
 
+Napi::Boolean MoveWindow(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+  if (info.Length() < 4) {
+    electronwallpaper::Output::createError(env, "attachWindow expects 5 arguments").ThrowAsJavaScriptException();
+  } else if (!info[0].IsObject()) {
+    electronwallpaper::Output::createError(env, "attachWindow expects first argument to be a window handle buffer").ThrowAsJavaScriptException();
+  }
+  unsigned char* windowHandleBuffer = info[0].As<Napi::Uint8Array>().Data();
+  long x = info[1].As<Napi::Number>().Int32Value();
+  long y = info[2].As<Napi::Number>().Int32Value();
+  long width = info[3].As<Napi::Number>().Int32Value();
+  long height = info[4].As<Napi::Number>().Int32Value();
+
+  return Napi::Boolean::New(env, electronwallpaper::SetWindowPos(windowHandleBuffer, x, y, width, height));
+}
+
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set(Napi::String::New(env, "attachWindow"), Napi::Function::New(env, AttachWindowExport));
+  exports.Set(Napi::String::New(env, "moveWindow"), Napi::Function::New(env, MoveWindow));
   return exports;
 }
 

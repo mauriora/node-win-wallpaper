@@ -15,9 +15,13 @@
  */
 
 #include "./output.h"
+#include <iostream>
 #include <napi.h>
+#include <sstream>
+#include <string>
 #include <system_error>
 #include <tchar.h>
+#include <vector>
 #include <windows.h>
 
 namespace electronwallpaper {
@@ -30,15 +34,21 @@ namespace electronwallpaper {
   };
 
   BOOL CALLBACK FindWorkerW(HWND hwnd, LPARAM param) {
-    HWND shelldll = FindWindowEx(hwnd, nullptr, _T("SHELLDLL_DefView"), nullptr);
+    HWND shelldll = FindWindowEx(hwnd, nullptr, "SHELLDLL_DefView", nullptr);
 
     if (shelldll) {
       auto* workerRef = reinterpret_cast<WorkerWRef*>(param);
-      workerRef->handle = FindWindowEx(nullptr, hwnd, _T("WorkerW"), nullptr);
+      workerRef->handle = FindWindowEx(nullptr, hwnd, "WorkerW", nullptr);
       return FALSE;
     }
 
     return TRUE;
+  }
+
+  bool SetWindowPos(unsigned char* handleBuffer, int x, int y, int width, int height) {
+    LONG_PTR handle = *reinterpret_cast<LONG_PTR*>(handleBuffer);
+    HWND hwnd = (HWND)(LONG_PTR)handle;
+    return MoveWindow(hwnd, x, y, width, height, TRUE);
   }
 
   void AttachWindow(unsigned char* handleBuffer, Napi::Env env) {
@@ -46,7 +56,7 @@ namespace electronwallpaper {
     HWND hwnd = (HWND)(LONG_PTR)handle;
     WorkerWRef workerRef{};
 
-    HWND progman = FindWindow(_T("Progman"), nullptr);
+    HWND progman = FindWindow("Progman", nullptr);
     LRESULT result = SendMessageTimeout(progman, WM_SPAWN_WORKER, NULL, NULL, SMTO_NORMAL, 1000, nullptr);
 
     if (!result) {
@@ -63,6 +73,6 @@ namespace electronwallpaper {
     // Update style of the Window we want to attach
     SetWindowLongPtr(hwnd, GWL_EXSTYLE, WS_EX_LAYERED);
     SetParent(hwnd, workerRef.handle);
-  }
+  };
 
 } // namespace electronwallpaper
