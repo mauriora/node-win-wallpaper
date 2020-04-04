@@ -43,6 +43,38 @@ body {
     outline-width: 2px;
   }
 
+  .display {
+    text-align: left;
+    margin-bottom: 15px;
+    /* width: 75%;
+    display: flex;
+    flex-direction: column; */
+  }
 
+  .display .title {
+    display: inline-block;
+    margin-right: 10px;
+
+    /* width: 100%; */
+  }
+
+  .display .size {
+    /* float: left; */
+  }
+
+  .display .button {
+    margin-right: 10px;
+    /* float: left; */
+  }
+
+  .display .displayfile {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100vw  - 200px);
+    text-align: right;
+    display: inline-block;
+    direction: rtl;
+  }
 
   
