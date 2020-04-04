@@ -4,9 +4,6 @@ const {
 
 const electronWallpaper = require('..');
 
-const ScreenRectangle = require('./screenrectangle');
-
-
 /**
  * @summary Creates and manages the mainwindow and all display windows
  */
@@ -14,9 +11,6 @@ class BrowserManager {
 
   ipc = ipcMain;
   browsers = {};
-
-  /** @type {ScreenRectangle} */
-  screenRectangle = new ScreenRectangle();
 
   /** @type {Electron.BrowserWindow} */
   mainWindow;
@@ -49,11 +43,11 @@ class BrowserManager {
     });
   }
 
-  /** @summary app.whenReady calls start to setupDisplays and createMainWindow */
+  /** triggered by app.whenReady to start electronWallpaper, setupDisplays and createMainWindow */
   start() {
+    electronWallpaper.init();
     this.setupDisplays();
     this.createMainWindow();
-    electronWallpaper.init();
   }
 
   /**
@@ -89,8 +83,11 @@ class BrowserManager {
     browser.once('show', () => {
       console.log(`${display.id}: Once show`);
       try {
-        browser.webContents.openDevTools();
-        electronWallpaper.attachWindowToDisplay(display.id,browser);
+        browser.webContents.openDevTools({
+          mode: 'detach',
+          activate: false
+        });
+        electronWallpaper.attachWindowToDisplay(display.id, browser);
         this.browsers[display.id] = browser;
       } catch (error) {
         console.error(error);
@@ -111,7 +108,6 @@ class BrowserManager {
     // Screen is available when electron.app.whenReady is emited
     screen.getAllDisplays().forEach(
       (display) => {
-        this.screenRectangle.addDisplay(display);
         this.ipc.on(`${display.id}-file`, (e, file) => {
           this.loadFile(display, file);
         });
@@ -163,7 +159,7 @@ class BrowserManager {
     this.mainWindow.loadFile('screenmanager.html');
 
     this.mainWindow.on('closed', () => {
-      Object.entries(this.browsers).forEach(([browserId, browser]) => {
+      Object.entries(this.browsers).forEach(([ browserId, browser ]) => {
         browser.close();
         Reflect.deleteProperty(this.browsers, browserId);
       });
