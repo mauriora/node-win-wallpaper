@@ -1,5 +1,6 @@
-'use strict';
-
+/**
+ * Calculates the virtual screen rectangle by adding the bounds of each display
+ */
 class ScreenRectangle {
   left = 0;
   top = 0;
@@ -7,8 +8,19 @@ class ScreenRectangle {
   bottom = 0;
   originDisplay = null;
 
-  get width() { return this._right - this._left; }
-  get height() { return this._bottom - this._top; }
+  /**
+   * Returns the distance between right and left
+   */
+  get width() {
+    return this.right - this.left;
+  }
+
+  /**
+   * Returns the distance between bottom and top
+   */
+  get height() {
+    return this.bottom - this.top;
+  }
 
   /**
    * Joins display.bounds to this ScreenRectangle
@@ -33,6 +45,6 @@ class ScreenRectangle {
     }
     console.log(`${display.id}: ${display.scaleFactor} * ${bounds.width} * ${bounds.height} @ ${bounds.x},${bounds.y} => ${this.width} * ${this.height} ${JSON.stringify(this)}`);
   }
-};
+}
 
 module.exports = ScreenRectangle;
