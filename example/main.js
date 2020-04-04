@@ -2,6 +2,8 @@ const {
   app, ipcMain, BrowserWindow, screen
 } = require('electron');
 
+const ScreenRectangle = require('./screenrectangle');
+
 const electronWallpaper = require('..');
 
 /**
@@ -11,6 +13,9 @@ class BrowserManager {
 
   ipc = ipcMain;
   browsers = {};
+
+  /** @type {ScreenRectangle} */
+  screenRectangle = new ScreenRectangle();
 
   /** @type {Electron.BrowserWindow} */
   mainWindow;
@@ -87,7 +92,14 @@ class BrowserManager {
         // #define WM_MOVE 0x0003
         // browser.unhookWindowMessage(WM_MOVE)
         //
-        // electronWallpaper.attachWindow(browser, bounds, screenId );
+
+        browser.unhookWindowMessage(3);
+        electronWallpaper.attachWindow(browser);
+        browser.setBounds({
+          x: display.workArea.x - this.screenRectangle.left,
+          y: display.workArea.y - this.screenRectangle.top
+        });
+
         //                      ^^^^^^
 
         this.browsers[display.id] = browser;
@@ -96,8 +108,8 @@ class BrowserManager {
         browser.close();
       }
     });
-    browser.once('move', () => {
-      console.log(`${display.id}: Once move`);
+    browser.on('move', () => {
+      console.log(`${display.id}: On move`);
     });
 
     return browser;
@@ -110,6 +122,7 @@ class BrowserManager {
     // Screen is available when electron.app.whenReady is emited
     screen.getAllDisplays().forEach(
       (display) => {
+        this.screenRectangle.addDisplay(display);
         this.ipc.on(`${display.id}-file`, (e, file) => {
           this.loadFile(display, file);
         });
