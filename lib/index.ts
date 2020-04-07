@@ -1,32 +1,42 @@
 import bindings from 'bindings';
-import ScreenBounds from './type/ScreenBounds';
-import Bounds from './type/Bounds';
-import NodeWallpaperNative from './type/NodeWallpaperNative';
-import { BrowserWindow, screen } from 'electron';
 import path from 'path';
-/* eslint-disable */
-//@ts-ignore
-const nodeWallpaperNative: NodeWallpaperNative = bindings({
+
+const nodeWinWallpaper: {
+    moveWindow(handle: Buffer, x: number, y: number, width: number, height: number): boolean;
+    attachWindow(handle: Buffer): void;
+} = bindings({
     // Workaround for webpack/electronforge shenanigans
+    // eslint-disable-next-line @typescript-eslint/camelcase
     module_root: path.resolve(path.join(__dirname, '../')),
     bindings: 'node-win-wallpaper'
-});
-/* eslint-enable */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+} as any as string);
 
-let currentBounds: ScreenBounds;
-export const moveWindow = (handle: Buffer, { x, y, width, height }: Bounds): boolean => {
-    return nodeWallpaperNative.moveWindow(handle, x, y, width, height);
-};
-export const init = (): void => {
-    currentBounds = new ScreenBounds(screen.getAllDisplays());
-};
-export const attachWindowToDisplay = (displayId: number, browserWindow: BrowserWindow): BrowserWindow => {
-    const handle = browserWindow.getNativeWindowHandle();
-    const displayBounds = currentBounds.findBoundsByDisplayId(displayId);
-    nodeWallpaperNative.attachWindow(handle);
-    if (displayBounds) {
-        moveWindow(handle, displayBounds);
+
+export interface Rectangle {
+    /**
+     * The height of the rectangle (must be an integer).
+     */
+    height: number;
+    /**
+     * The width of the rectangle (must be an integer).
+     */
+    width: number;
+    /**
+     * The x coordinate of the origin of the rectangle (must be an integer).
+     */
+    x: number;
+    /**
+     * The y coordinate of the origin of the rectangle (must be an integer).
+     */
+    y: number;
+}
+
+export default {
+    moveWindow: function(handle: Buffer, {x, y, width, height}: Rectangle): boolean {
+        return nodeWinWallpaper.moveWindow(handle, x, y, width, height);
+    },
+    attachWindow: function(handle: Buffer): void {
+        return nodeWinWallpaper.attachWindow(handle);
     }
-    return browserWindow;
 };
-export const attachWindow = nodeWallpaperNative.attachWindow;
