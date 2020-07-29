@@ -35,7 +35,7 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "node-win-wallpaper",
+  "name": "@mauriora/node-win-wallpaper",
   "author": "Corey Sewell",
   "module": "dist/node-win-wallpaper.esm.js",
   "devDependencies": {
