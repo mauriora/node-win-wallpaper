@@ -20,7 +20,7 @@
     "rebuild": "node-gyp rebuild",
     "rebuild-electron": "electron-rebuild -f",
     "configure": "node-gyp configure",
-    "install": "build",
+    "install": "tsdx build --entry lib/index.ts && node-gyp rebuild",
     "prebuild-release": "prebuild --all --strip"
   },
   "peerDependencies": {},
