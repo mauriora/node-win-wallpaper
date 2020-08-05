@@ -20,7 +20,7 @@
     "rebuild": "node-gyp rebuild",
     "rebuild-electron": "electron-rebuild -f",
     "configure": "node-gyp configure",
-    "install": "prebuild-install || node-gyp rebuild",
+    "install": "build",
     "prebuild-release": "prebuild --all --strip"
   },
   "peerDependencies": {},
